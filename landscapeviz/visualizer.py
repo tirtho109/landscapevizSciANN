@@ -20,16 +20,28 @@ def _fetch_data(key, filename):
     X, Y = np.meshgrid(space, space)
     return X, Y, Z
 
+# plt_contour from https://github.com/nimahsn/landscapeviz/blob/master/landscapeviz/visualizer.py
 
 def plot_contour(
-    key, vmin=0.1, vmax=10, vlevel=0.5, trajectory=None, filename=FILENAME, save=False
+    key, filename=FILENAME, vmin=0.1, vmax=10, vlevel=0.5, log=False, margin=0, colorbar=True, colormap=plt.cm.coolwarm, dpi=100, trajectory=None, save=False
 ):
 
     X, Y, Z = _fetch_data(key, filename)
 
-    fig, ax = plt.subplots()
-    CS = ax.contour(X, Y, Z, cmap="summer", levels=np.arange(vmin, vmax, vlevel))
+    if margin > 0:
+        Z = Z[margin:-margin, margin:-margin]
+        X = X[margin:-margin, margin:-margin]
+        Y = Y[margin:-margin, margin:-margin]
+
+    if log:
+        Z = np.log10(Z + 0.1)
+
+
+    fig, ax = plt.subplots(dpi=dpi)
+    CS = ax.contour(X, Y, Z, cmap=colormap, levels=np.arange(vmin, vmax, vlevel))
     ax.clabel(CS, inline=1, fontsize=8)
+    if colorbar:
+        fig.colorbar(CS)
 
     if trajectory:
         with h5py.File(

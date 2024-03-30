@@ -6,6 +6,7 @@ import h5py
 import numpy as np
 import tensorflow as tf
 from sklearn.decomposition import PCA
+import inspect
 
 from .trajectory import load_weights, weight_encoder
 
@@ -14,7 +15,7 @@ def get_vectors(model, seed=None, trajectory=None):
 
     np.random.seed(seed)
     vector_x, vector_y = list(), list()
-    weights = model.get_weights()
+    weights = model.model.get_weights()
 
     if trajectory:
         # this has to be re-written
@@ -73,12 +74,22 @@ def get_vectors(model, seed=None, trajectory=None):
 
 def _obj_fn(model, data, solution):
 
-    old_weights = model.get_weights()
-    model.set_weights(solution)
-    value = model.evaluate(data[0], data[1], verbose=0)
-    model.set_weights(old_weights)
+    old_weights = model.model.get_weights()
+    model.model.set_weights(solution)
+    value = model.model.evaluate(data[0], data[1], verbose=0)
+    model.model.set_weights(old_weights)
 
     return value
+
+def get_model_loss_func(model):
+    model_loss_function = model.loss_functions
+    argspec = inspect.getfullargspec(model_loss_function)
+
+    default_args = dict(zip(argspec.args[-len(argspec.defaults):], argspec.defaults))
+
+    loss_method = default_args.get('method', None)
+    return loss_method
+
 
 
 def build_mesh(
@@ -94,8 +105,8 @@ def build_mesh(
 
     logging.basicConfig(level=logging.INFO)
 
-    z_keys = model.metrics_names
-    z_keys[0] = model.loss
+    z_keys =  model.model.metrics_names #["mse"] 
+    z_keys[0] = get_model_loss_func(model)
     Z = list()
 
     # get vectors and set spacing
