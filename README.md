@@ -1,3 +1,8 @@
+# Visualizing the Loss Landscape of Neural Networks with SciANN
+
+This repository adapts the original [landscapeviz](https://github.com/artur-deluca/landscapeviz/tree/master?tab=readme-ov-file) implementation for visualization of neural network loss landscapes to be compatible with [SciANN](https://www.sciann.com/) models. A sample example can be found in the [example folder](https://github.com/tirtho109/landscapevizSciANN/tree/master/example).
+
+
 # Visualizing the Loss Landscape of Neural Networks
 > <b>Application showcasing landscapeviz [here](http://arturdeluca.pythonanywhere.com/)</b>
 
